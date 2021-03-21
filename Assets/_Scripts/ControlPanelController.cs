@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class ControlPanelController : MonoBehaviour
 {
@@ -15,14 +17,24 @@ public class ControlPanelController : MonoBehaviour
     public float timer = 0.0f;
     public bool isOnScreen = false;
 
+    [Header("Player Settings")]
+    public PlayerBehaviour player;
     public CameraController playerCamera;
 
     public Pauseable pausable;
+
+    [Header("Scene Data")]
+    public SceneDaraSO sceneData;
+
+    public GameObject gameStateLabel;
+
+
 
     // Start is called before the first frame update
     void Start()
     {
         pausable = FindObjectOfType<Pauseable>();
+        player = FindObjectOfType<PlayerBehaviour>();
         playerCamera = FindObjectOfType<CameraController>();
         rectTransform = GetComponent<RectTransform>();
         rectTransform.anchoredPosition = offScreenPosition;
@@ -40,11 +52,15 @@ public class ControlPanelController : MonoBehaviour
         if (isOnScreen)
         {
             MoveControlPanelDown();
+           
         }
         else
         {
             MoveControlPanelUp();
+          
         }
+
+        gameStateLabel.SetActive(pausable.isGamePaused);
     }
 
     void ToggleControlPanel()
@@ -92,4 +108,23 @@ public class ControlPanelController : MonoBehaviour
     {
         ToggleControlPanel();
     }
+
+    public void OnloadButtonPressed()
+    {
+        player.controller.enabled = false;
+        player.transform.position = sceneData.playerPosition;
+        player.transform.rotation = sceneData.playerRotation;
+        player.controller.enabled = true;
+
+        player.health = sceneData.playerHealth;
+        player.healthBar.SetHealth(sceneData.playerHealth);
+    }
+
+    public void OnSaveButtonPressed()
+    {
+        sceneData.playerPosition = player.transform.position;
+        sceneData.playerRotation = player.transform.rotation;
+        sceneData.playerHealth = player.health;
+    }
+
 }
